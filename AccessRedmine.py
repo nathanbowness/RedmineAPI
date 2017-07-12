@@ -1,6 +1,6 @@
 from pyaccessories.SaveLoad import SaveLoad
 from RedmineAPI import RedmineInterface
-from Utilities import DefaultValues, FileExtension
+from RedmineUtilities import DefaultValues, FileExtension
 from RedmineIssue import Issue
 import os
 
