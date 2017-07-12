@@ -34,7 +34,6 @@ class RedmineInterface(object):
         :param additional_notes: Notes to upload the file with
         :param status_change: Number from 1 - 4, 2 is in progress 4 is feedback
         """
-
         url = urljoin(self.url, 'uploads.json')
         headers = {'X-Redmine-API-Key': self.api_key, 'content-type': 'application/octet-stream'}
         self.logger.info("Uploading %s to redmine..." % filepath)
@@ -44,17 +43,21 @@ class RedmineInterface(object):
             import os
             file_name_once_uploaded = os.path.split(filepath)[-1]
 
-        resp = requests.post(url, headers=headers, files={file_name_once_uploaded: open(filepath, "rb")})
-        import json
+        with open(filepath, 'rb') as myzip:
+            files = {file_name_once_uploaded: (file_name_once_uploaded, myzip.read(), 'application/zip')}
+            resp = requests.post(url, headers=headers, files=files)
+
         if resp.status_code == 201:
-            token = json.loads(resp.content.decode("utf-8"))['upload']['token']
+            token = resp.json()['upload']['token']
+            print()
         else:
             err = "Status code %s, Message %s" % (resp.status_code, resp.content.decode("utf-8"))
             self.logger.error("[Error] Problem uploading file to Redmine: " + err)
             raise RedmineUploadError("Failed to upload file to Redmine. Status code %s, Message %s" %
                                      (resp.status_code, resp.content.decode("utf-8")))
         data = {
-            "issue": {
+             "issue": {
+                "id": issue_id,
                 "uploads": [
                     {
                         "token": token,
@@ -63,12 +66,35 @@ class RedmineInterface(object):
                     }
                 ],
                 "notes": additional_notes
-            }
-        }
+                    }
+                 }
         if status_change is not None:
             data['issue']['status_id'] = status_change
 
         self.__put_request_timeout(urljoin(self.url, '/issues/%s.json' % str(issue_id)), data)
+
+    def __put_request_timeout(self, url, data):
+        import time
+
+        self.wait = 60
+        self.logger.info("Sending PUT request to %s" % url)
+        headers = {'X-Redmine-API-Key': self.api_key, 'content-type': 'application/json'}
+        resp = requests.put(url, headers=headers, json=data)
+        print(resp.headers)
+        tries = 0
+        while (resp.status_code != 200 and resp.status_code != 201) and tries < 10:  # OK / Created
+            self.logger.warning("PUT request returned status code %d, with message %s. Waiting %ds to retry." %
+                                (resp.status_code, resp.content.decode('utf-8'), self.wait))
+            time.sleep(self.wait)
+            self.logger.warning("Retrying...")
+            resp = requests.put(url, headers=headers, json=data)
+            tries += 1
+
+        if tries >= 10:
+            raise RedmineConnectionError("Could not connect to redmine servers. Status code %d, message:\n%s"
+                                         % (resp.status_code, resp.content.decode('utf-8')))
+        else:
+            return resp.status_code
 
     def get_new_issues(self, project='cfia', num_issues=25):
         """
@@ -189,30 +215,6 @@ class RedmineInterface(object):
                                          % (resp.status_code, resp.content.decode('utf-8')))
         else:
             return json.loads(resp.content.decode("utf-8"))
-
-    def __put_request_timeout(self, url, data):
-        import time
-
-        self.wait = 60
-
-        self.logger.info("Sending PUT request to %s" % url)
-
-        headers = {'X-Redmine-API-Key': self.api_key, 'content-type': 'application/json'}
-        resp = requests.put(url, headers=headers, json=data)
-        tries = 0
-        while (resp.status_code != 200 and resp.status_code != 201) and tries < 10:  # OK / Created
-            self.logger.warning("PUT request returned status code %d, with message %s. Waiting %ds to retry." %
-                                (resp.status_code, resp.content.decode('utf-8'), self.wait))
-            time.sleep(self.wait)
-            self.logger.warning("Retrying...")
-            resp = requests.put(url, headers=headers, json=data)
-            tries += 1
-
-        if tries >= 10:
-            raise RedmineConnectionError("Could not connect to redmine servers. Status code %d, message:\n%s"
-                                         % (resp.status_code, resp.content.decode('utf-8')))
-        else:
-            return resp.status_code
 
 
 class RedmineConnectionError(ValueError):
