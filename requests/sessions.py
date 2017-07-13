@@ -313,7 +313,7 @@ class Session(SessionRedirectMixin):
 
     Basic Usage::
 
-      >>> import requests
+      >>> from RedmineAPI import requests
       >>> s = requests.Session()
       >>> s.get('http://httpbin.org/get')
       <Response [200]>

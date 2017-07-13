@@ -18,7 +18,7 @@ import encodings.idna
 
 from urllib3.fields import RequestField
 # changed from the urllib3 so that the body will not have headers added to it
-from filepost import encode_multipart_formdata
+from ..filepost import encode_multipart_formdata
 from urllib3.util import parse_url
 from urllib3.exceptions import (
     DecodeError, ReadTimeoutError, ProtocolError, LocationParseError)
