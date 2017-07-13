@@ -43,8 +43,8 @@ class RedmineInterface(object):
             import os
             file_name_once_uploaded = os.path.split(filepath)[-1]
 
-        with open(filepath, 'rb') as myzip:
-            files = {file_name_once_uploaded: (file_name_once_uploaded, myzip.read(), 'application/zip')}
+        with open(filepath, 'rb') as file:
+            files = {file_name_once_uploaded: (file_name_once_uploaded, file.read(), content_type)}
             resp = requests.post(url, headers=headers, files=files)
 
         if resp.status_code == 201:
