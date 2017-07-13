@@ -142,6 +142,7 @@ class RedmineInterface(object):
 
     def download_file(self, content_url, decode=True):
         """
+        Download file works with text, csv and tsv files for now with the decoding the way it is
         :param content_url: url of the file to download 
         :param decode: whether or not to decode the file as utf-8 (keep this on for text files)
         :return: string if decoded, else a bytes type.

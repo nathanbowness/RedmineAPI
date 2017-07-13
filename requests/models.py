@@ -209,7 +209,7 @@ class Request(RequestHooksMixin):
 
     Usage::
 
-      >>> import requests
+      >>> from RedmineAPI import requests
       >>> req = requests.Request('GET', 'http://httpbin.org/get')
       >>> req.prepare()
       <PreparedRequest [GET]>

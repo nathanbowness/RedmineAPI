@@ -46,7 +46,7 @@ def request(method, url, **kwargs):
 
     Usage::
 
-      >>> import requests
+      >>> from RedmineAPI import requests
       >>> req = requests.request('GET', 'http://httpbin.org/get')
       <Response [200]>
     """

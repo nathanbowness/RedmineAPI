@@ -7,6 +7,7 @@ class Issue:
         """
         self.subject = issue_dict['subject']
         self.id = issue_dict['id']
+        self.description = issue_dict['description']
 
         self.author = issue_dict['author']
         self.author_id = self.author['id']

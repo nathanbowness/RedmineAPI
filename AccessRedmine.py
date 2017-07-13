@@ -7,11 +7,12 @@ import os
 
 class Redmine:
 
-    def __init__(self, api_key):
+    def __init__(self, timelog, api_key):
         """
         Sets the redmine api key to access redmine
         :param api_key: 
         """
+        self.timelog = timelog
         self.api_key = api_key
         self.redmine_api = RedmineInterface('http://redmine.biodiversity.agr.gc.ca/', self.api_key)
 
@@ -38,8 +39,45 @@ class Redmine:
 
         return found_issues
 
+    def get_specified_attachment_types(self, issue, extn='.txt', decode=True):
+        """
+        :param issue: the issue the files are attached on
+        :param extn: the extension type of the files you would like returned
+        :param decode: whether or not to decode the file once downloaded
+        :return: a list of all the attachments of a Redmine issue with the specified extension
+        """
+        # create a list of all attachments
+        attachments = self.redmine_api.get_issue_data(issue.id)['issue']['attachments']
+        files = list()
+        for attachment in attachments:
+            if attachment['filename'].endswith(extn):
+                self.timelog.time_print('Found the attachment %s, downloading to the list...' % attachment['filename'])
+                files.append(self.redmine_api.download_file(attachment['content_url'], decode))
+
+        return files
+
+    def get_attached_text_file(self, issue, index):
+        """
+        Return an attached text file to the user - includes .txt , .csv and .tsv files      
+        :param issue: the issue the files are attached on
+        :param index: the specific file on the Redmine Issue you would like to receive i.e. [0] = 1 
+        :return: return the downloaded file
+        """
+
+        # create a list of all attachments
+        attachments = self.redmine_api.get_issue_data(issue.id)['issue']['attachments']
+        file_name = attachments[index]['filename']
+
+        # Log the file being downloaded
+        self.timelog.time_print("Found the attachment to the Redmine Request: %s" % file_name)
+        self.timelog.time_print("Downloading file.....")
+
+        file = self.redmine_api.download_file(attachments[0]['content_url'])
+        return file
+
     def get_attached_files(self, issue):
         """
+        Used to return all attached files and run custom commands on the returned list
         :param issue: takes an issue object passed through
         :return: returns a list/dict of all the attachments associated with the selected issue
         """
