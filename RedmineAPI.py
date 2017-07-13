@@ -1,4 +1,4 @@
-import requests
+from . import requests
 import logging
 from urllib.parse import urljoin
 

@@ -2,7 +2,6 @@ class DefaultValues:
 
     # default values
     nas_mount_path = "/mnt/nas/"
-    drive_mount_path = "/media/bownessn/My Passport/"
     check_time = 600
     first_run = 'yes'
 
