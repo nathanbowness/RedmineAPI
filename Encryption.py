@@ -5,6 +5,9 @@ class Encryption:
 
     @staticmethod
     def encode(key, string):
+        """
+        Encodes a given string with the inputed key 
+        """
         encoded_chars = []
         for i in range(len(string)):
             key_c = key[i % len(key)]
@@ -17,6 +20,9 @@ class Encryption:
 
     @staticmethod
     def decode(key, string):
+        """
+        Decodes a given string with the inputed key 
+        """
         decoded_chars = []
         string = base64.urlsafe_b64decode(string).decode('utf-8')
         for i in range(len(string)):
