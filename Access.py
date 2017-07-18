@@ -1,11 +1,11 @@
 from . pyaccessories.SaveLoad import SaveLoad
 from . RedmineAPI import RedmineInterface
-from . RedmineUtilities import DefaultValues, FileExtension
+from . Utilities import Values, FileExtension
 from . RedmineIssue import Issue
 import os
 
 
-class Redmine:
+class RedmineAccess:
 
     def __init__(self, timelog, api_key):
         """
@@ -23,10 +23,17 @@ class Redmine:
         self.issue_loader = SaveLoad(os.path.join(script_dir, FileExtension.issues_json),
                                      create=True)
         # creates a list of already responded to issue to query before starting new tasks
-        self.rm_responded_issues = set(self.issue_loader.get(DefaultValues.responded_issues, default=[], ask=False))
+        self.rm_responded_issues = set(self.issue_loader.get(Values.responded_issues, default=[], ask=False))
 
     def retrieve_issues(self, issue_status, issue_title):
-
+        """
+        Retrieve issues from Redmine specified with a specific issue status and title 
+        :param issue_status: Status of the issue - must match the text as seen on Redmine
+        :param issue_title: Title of the issue - must be entered in all lower case
+        :return: The issues associated with the above
+        """
+        self.timelog.time_print("Checking for requests matching Issue Status: %s and Issue Title: %s" % (issue_status,
+                                                                                                         issue_title))
         data = self.redmine_api.get_new_issues('cfia')
         found_issues = []
 
@@ -37,6 +44,9 @@ class Redmine:
                 if issue['subject'].lower().rstrip() == issue_title:
                     found_issues.append(Issue(issue))
 
+        self.timelog.time_print("Found %d new issue(s)..." % len(found_issues))
+
+        # returns number of issues
         return found_issues
 
     def get_specified_attachment_types(self, issue, extn='.txt', decode=True):
@@ -66,13 +76,17 @@ class Redmine:
 
         # create a list of all attachments
         attachments = self.redmine_api.get_issue_data(issue.id)['issue']['attachments']
+
+        if len(attachments) < 0:
+            return None
+
         file_name = attachments[index]['filename']
 
         # Log the file being downloaded
         self.timelog.time_print("Found the attachment to the Redmine Request: %s" % file_name)
         self.timelog.time_print("Downloading file.....")
 
-        file = self.redmine_api.download_file(attachments[0]['content_url'])
+        file = self.redmine_api.download_file(attachments[index]['content_url'])
         return file
 
     def get_attached_files(self, issue):
