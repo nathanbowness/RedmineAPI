@@ -49,20 +49,20 @@ def create_time_log(folder_name="running_logs"):
     base_path = sys.path[0]
     create_logging_dir(base_path, folder_name)
 
-    time_log = Timer(log_file=os.path.join(basepath, folder_name,
+    time_log = Timer(log_file=os.path.join(base_path, folder_name,
                                            datetime.datetime.now().strftime("%d-%m-%Y_%H:%M:%S")))
     time_log.set_colour(30)
     return time_log
 
 
-def create_logging_dir(basepath, folder_name):
+def create_logging_dir(base_path, folder_name):
     """
     Creates the directory to log files in if it does not exist
     basepath: current path to the project (or specified place to create the folder)
     folder_name: name of the folder you would like the logs to be stored in
     """
-    if not os.path.exists(os.path.join(basepath, folder_name)):
-        os.makedirs(os.path.join(basepath, folder_name))
+    if not os.path.exists(os.path.join(base_path, folder_name)):
+        os.makedirs(os.path.join(base_path, folder_name))
 
 
 def get_validated_seqids(sequences_list):
