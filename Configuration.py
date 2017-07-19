@@ -14,7 +14,6 @@ class Setup(object):
         Key: the key will be used to index the value to the config file for setup
         3 Values: ("default value", ask user" - i.e. True/False, "type of value" - i.e. str, int....) 
                     - a value of None is the default for all parts except for "Ask" which is True
-        :return: A dictionary of inputted keys with values of entered by the user (values logged to the config file)
         """
         # save the time logger
         self.timelog = time_log
@@ -42,6 +41,9 @@ class Setup(object):
         self.first_run = self.default_config_values[Keys.first_run]
 
     def setup_default_terms(self):
+        """
+        Set the default terms to run the Redmine API to a terms dictionary
+        """
         # Setting config with pattern -
         # default_dict["json config key"] = ("Default Value", "Ask User", "Value Type")
 
