@@ -40,12 +40,36 @@ class FileExtension:
     issues_json = 'responded_issues.json'
 
 
-def create_timerlog(basepath, path_ext):
-    return Timer(log_file=os.path.join(basepath, path_ext,
-                                       datetime.datetime.now().strftime("%d-%m-%Y_%H:%M:%S")))
+def create_time_log(folder_name="running_logs"):
+    """
+    Creates a logging object that will write outputs to a new folder specified by the user
+    folder_name: name of the folder you would like the logs to be stored in
+    """
+    import sys
+    base_path = sys.path[0]
+    create_logging_dir(base_path, folder_name)
+
+    time_log = Timer(log_file=os.path.join(basepath, folder_name,
+                                           datetime.datetime.now().strftime("%d-%m-%Y_%H:%M:%S")))
+    time_log.set_colour(30)
+    return time_log
+
+
+def create_logging_dir(basepath, folder_name):
+    """
+    Creates the directory to log files in if it does not exist
+    basepath: current path to the project (or specified place to create the folder)
+    folder_name: name of the folder you would like the logs to be stored in
+    """
+    if not os.path.exists(os.path.join(basepath, folder_name)):
+        os.makedirs(os.path.join(basepath, folder_name))
 
 
 def get_validated_seqids(sequences_list):
+    """
+    A inputted list is checked for Seq-ID format, each of the Elements that are validated are returned to the user
+    sequences_list: list of Seq-IDs to be validated
+    """
 
     validated_sequence_list = list()
     regex = r'^(2\d{3}-\w{2,10}-\d{3,4})$'
