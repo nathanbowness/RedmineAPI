@@ -71,16 +71,26 @@ class RedmineAccess:
         Return an attached text file to the user - includes .txt , .csv and .tsv files      
         :param issue: the issue the files are attached on
         :param index: the specific file on the Redmine Issue you would like to receive i.e. [0] = 1 
-        :return: return the downloaded file
+        :return: return the downloaded file or none if no file is attached
         """
 
-        # create a list of all attachments
-        attachments = self.redmine_api.get_issue_data(issue.id)['issue']['attachments']
-
-        if len(attachments) < 0:
+        try:
+            # create a list of all attachments
+            attachments = self.redmine_api.get_issue_data(issue.id)['issue']['attachments']
+            if len(attachments) < 0:
+                return None
+        except KeyError:
+            # If error due to no attachments, return none
             return None
 
-        file_name = attachments[index]['filename']
+        # could be another layer to the extension if needed or in future for specific types
+        # if attachment['filename'].endswith('.txt'):
+
+        try:
+            # try to get the file name of the corresponding index, if it does not exist return nothing
+            file_name = attachments[index]['filename']
+        except IndexError:
+            return None
 
         # Log the file being downloaded
         self.timelog.time_print("Found the attachment to the Redmine Request: %s" % file_name)
