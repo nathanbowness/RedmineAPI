@@ -10,12 +10,13 @@ class Setup(object):
 
     def __init__(self, time_log, custom_terms):
         """
-        :param custom_terms: Dictionary indexed by a key and a tuple for the value with 2 values
-        Key: the key will be used to index the value to the config file for setup
-        3 Values: ("default value", ask user" - i.e. True/False, "type of value" - i.e. str, int....) 
-                    - a value of None is the default for all parts except for "Ask" which is True
+        :param time_log: log the can be written to
+        :param custom_terms: dictionary of custom term information with format - 
+        Key: used to index the value to the config file for setup
+        Value: 3 Item Tuple ("default value", ask user" - i.e. True/False, "type of value" - i.e. str, int....)
+        - A value of None is the default for all parts except for "Ask" which is True
         """
-        # save the time logger
+        # save the time log
         self.timelog = time_log
 
         script_dir = sys.path[0]
@@ -63,6 +64,10 @@ class Setup(object):
         return config_values
 
     def set_api_key(self, force):
+        """
+        Sets the API key for the automation process either from the config file or the users input
+        :param force: determines whether or not the user is asked for the RedmineAPI key or not
+        """
 
         if self.first_run == 'yes' and force:
             raise ValueError('Need redmine API key!')
