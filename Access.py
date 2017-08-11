@@ -116,14 +116,15 @@ class RedmineAccess:
         self.issue_loader.responded_issues = list(self.rm_responded_issues)
         self.issue_loader.dump()
 
-    def update_status_inprogress(self, issue, message):
+    def update_status_inprogress(self, issue, message=""):
         """
         Updates the issue to In Progress, while posting a specified message
         """
-        self.redmine_api.update_issue(issue.id, notes=message, status_change=2)
+        self.redmine_api.update_issue(issue.id, notes=issue.redmine_msg + message, status_change=2)
 
-    def update_issue_to_author(self, issue, message):
+    def update_issue_to_author(self, issue, message=""):
         """
         Updates the issue to Feedback and assigns the Redmine Request back to the Author while updating with a message
         """
-        self.redmine_api.update_issue(issue.id, notes=message, status_change=4, assign_to_id=issue.author_id)
+        self.redmine_api.update_issue(issue.id, notes=issue.redmine_msg + message, status_change=4,
+                                      assign_to_id=issue.author_id)
