@@ -32,7 +32,7 @@ class Setup(object):
         # Define and set the final values from the user for all default fields
         self.default_config_values = self.get_config_values(self.default_terms)
 
-        # Define and set the final values from the user for all default fields
+        # Define and set the final values from the user for all custom fields
         self.custom_config_values = self.get_config_values(custom_terms)
 
         # Get the api_key and first_run once the values for the program have been inputted by the user
